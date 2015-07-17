@@ -20,10 +20,12 @@ namespace OpenSim{
             "Integral gain for position errors.");
         OpenSim_DECLARE_PROPERTY(kiv, double,
             "Integral gain for velocity error.");
-        OpenSim_DECLARE_PROPERTY(coordinateName, std::string,
+        OpenSim_DECLARE_PROPERTY(coordinate_name, std::string,
             "Name of coordinate to track.");
-        OpenSim_DECLARE_PROPERTY(actuatorName, std::string,
+        OpenSim_DECLARE_PROPERTY(actuator_name, std::string,
             "Name of actuator to control.");
+        OpenSim_DECLARE_PROPERTY(desired_states_file, std::string,
+            "Storage file containing the desired trajecttory (position, velocity) for the coordinate of interest.");
 
         DoubleLoopPIController();
         DoubleLoopPIController(const std::string &coordinateName, const std::string &actuatorName);

@@ -1,7 +1,6 @@
 // Authors: Luca Tagliapietra, Elena Ceseracciu, Monica Reggiani
 
 #include "DoubleLoopPIController.h"
-#include "SimulationManager.h"
 #include <stdio.h>
 using std::cout;
 using std::endl;
@@ -24,8 +23,8 @@ TrackingController()
 OpenSim::DoubleLoopPIController::DoubleLoopPIController(const std::string &coordinateName, const std::string &actuatorName) :
 TrackingController()
 {
-    set_coordinateName(coordinateName);
-    set_actuatorName(actuatorName);
+    set_coordinate_name(coordinateName);
+    set_actuator_name(actuatorName);
 }
 
 OpenSim::DoubleLoopPIController::DoubleLoopPIController(const std::string &aFileName, bool aUpdateFromXMLNode) :
@@ -51,8 +50,9 @@ void OpenSim::DoubleLoopPIController::copyData(const DoubleLoopPIController &aCo
     set_kip(aController.get_kip());
     set_kiv(aController.get_kiv());
 
-    set_coordinateName(aController.get_coordinateName());
-    set_actuatorName(aController.get_actuatorName());
+    set_coordinate_name(aController.get_coordinate_name());
+    set_actuator_name(aController.get_actuator_name());
+    set_desired_states_file(aController.get_desired_states_file());
 
     refSplinePosition_ = aController.refSplinePosition_;
     refSplineVelocity_ = aController.refSplineVelocity_;
@@ -79,20 +79,19 @@ void OpenSim::DoubleLoopPIController::constructProperties()
     constructProperty_kip(1.0);
     constructProperty_kiv(1.0);
 
-    constructProperty_coordinateName("motor");
-    constructProperty_actuatorName("DCmotor");
+    constructProperty_coordinate_name("motor");
+    constructProperty_actuator_name("DCmotor");
+    constructProperty_desired_states_file("");
 }
 void OpenSim::DoubleLoopPIController::computeControls(const SimTK::State& s, SimTK::Vector &controls) const
 {
     double time = s.getTime();
-    const OpenSim::Coordinate& motorCoordinate = getModel().getCoordinateSet().get(get_coordinateName());
+    const OpenSim::Coordinate& motorCoordinate = getModel().getCoordinateSet().get(get_coordinate_name());
     double curPosition = motorCoordinate.getValue(s);
     double curSpeed = motorCoordinate.getSpeedValue(s);
-
     SimTK::Vector timeV(1);
     timeV[0] = time;
     double refPosition = refSplinePosition_.calcValue(timeV);
-
     // Position error, input for the P controller of position
     double posError = refPosition - curPosition;
     // Integral of position error, input for the I controller of position
@@ -107,7 +106,7 @@ void OpenSim::DoubleLoopPIController::computeControls(const SimTK::State& s, Sim
     double integralVelError = getStateVariable(s, "integral_error_velocity");
 
     double cv = get_kiv()*integralVelError + get_kpv()*speedError;
-    int actuatorId = getModel().getForceSet().getIndex(get_actuatorName());
+    int actuatorId = getModel().getForceSet().getIndex(get_actuator_name());
     controls[actuatorId] = cv;
 }
 
@@ -152,6 +151,10 @@ void OpenSim::DoubleLoopPIController::addToSystem(SimTK::MultibodySystem& system
 void OpenSim::DoubleLoopPIController::connectToModel(OpenSim::Model& model)
 {
     Super::connectToModel(model);
+    if (get_desired_states_file() != ""){
+        Storage desiredStorage(get_desired_states_file());
+        setDesiredStatesStorage(&desiredStorage);
+    }
 }
 
 SimTK::Vector OpenSim::DoubleLoopPIController::computeStateVariableDerivatives(const SimTK::State& s) const
@@ -159,7 +162,7 @@ SimTK::Vector OpenSim::DoubleLoopPIController::computeStateVariableDerivatives(c
     SimTK::Vector derivs(getNumStateVariables(), 0.);
     // same as computeControls():
     double time = s.getTime();
-    const OpenSim::Coordinate& motorCoordinate = getModel().getCoordinateSet().get(get_coordinateName());
+    const OpenSim::Coordinate& motorCoordinate = getModel().getCoordinateSet().get(get_coordinate_name());
     double curPosition = motorCoordinate.getValue(s);
     double curSpeed = motorCoordinate.getSpeedValue(s);
     SimTK::Vector timeV(1);
@@ -182,15 +185,17 @@ SimTK::Vector OpenSim::DoubleLoopPIController::computeStateVariableDerivatives(c
 void OpenSim::DoubleLoopPIController::setDesiredStatesStorage(const OpenSim::Storage* aYDesStore)
 {
     _desiredStatesStorage = aYDesStore;
-    OpenSim::Array<double> expPos, expVel, expTor;
-    const string expPosLabel("motor");
-    const string expVelLabel("motor_u");
+    OpenSim::Array<double> expPos, expVel;
+    const string expPosLabel(get_coordinate_name());
+    const string expVelLabel(get_coordinate_name()+ "_u");
     OpenSim::Array<double> expTime;
     _desiredStatesStorage->getTimeColumn(expTime);
     // cannot use getDataColumn(string, Array) overload as it is not const :(
+    //TODO : throw exception if columns are not found!
     _desiredStatesStorage->getDataColumn(_desiredStatesStorage->getStateIndex(expPosLabel), expPos);
     _desiredStatesStorage->getDataColumn(_desiredStatesStorage->getStateIndex(expVelLabel), expVel);
 
+    //TODO: check that splines are empty??
     for (int i = 0; i < expTime.getSize(); i++) {
         refSplinePosition_.addPoint(expTime[i], SimTK::convertDegreesToRadians(expPos[i]));
         refSplineVelocity_.addPoint(expTime[i], SimTK::convertDegreesToRadians(expVel[i]));

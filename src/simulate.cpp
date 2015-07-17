@@ -28,7 +28,6 @@ int main(int argc, char**argv) {
         exit(EXIT_FAILURE);
     }
 
-    OpenSim::DoubleLoopPIController::registerType();
     const string modelName = argv[1];
     const string dataDir = argv[2];
 
