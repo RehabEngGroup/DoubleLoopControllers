@@ -13,6 +13,8 @@ using std::map;
 #include <string>
 using std::string;
 
+#include <OpenSim/Common/LoadOpenSimLibrary.h>
+
 #include "ConfigurationInterpreter.h"
 #include "SimulationManager.h"
 #include "DoubleLoopPIController.h"
@@ -53,6 +55,7 @@ int main(int argc, char**argv) {
 
     const string integratorName = "notRungeKuttaMerson";
 
+    OpenSim::LoadOpenSimLibrary("DoubleLoopController");
 
     // ----- Load the Opensim Model
     OpenSim::Model biodexModel(modelName);

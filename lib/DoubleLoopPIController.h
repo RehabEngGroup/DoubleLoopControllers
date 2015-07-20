@@ -5,8 +5,6 @@
 
 #include <OpenSim/OpenSim.h>
 
-class SimulationManager;
-
 namespace OpenSim{
     class DoubleLoopPIController : public OpenSim::TrackingController
     {
