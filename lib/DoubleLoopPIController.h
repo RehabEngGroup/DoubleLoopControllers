@@ -6,9 +6,9 @@
 #include <OpenSim/OpenSim.h>
 
 namespace OpenSim{
-    class DoubleLoopPIController : public OpenSim::TrackingController
+    class DoubleLoopPIController : public OpenSim::Controller
     {
-        OpenSim_DECLARE_CONCRETE_OBJECT(DoubleLoopPIController, OpenSim::TrackingController);
+        OpenSim_DECLARE_CONCRETE_OBJECT(DoubleLoopPIController, OpenSim::Controller);
     public:
         OpenSim_DECLARE_PROPERTY(kpp, double,
             "Proportional gain for position errors.");
@@ -54,7 +54,6 @@ namespace OpenSim{
         void setVelocityLoopPIGains(std::vector<double>& gains);
         void setDoubleLoopPIGains(const std::vector<double>& gains);
         virtual void setDesiredStatesStorage(const OpenSim::Storage* aYDesStore);
-        virtual const OpenSim::Storage& getDesiredStatesStorage() const;
         static void registerType();
     protected:
         void copyData(const DoubleLoopPIController &aController);

@@ -15,27 +15,27 @@ void OpenSim::DoubleLoopPIController::registerType()
 }
 
 OpenSim::DoubleLoopPIController::DoubleLoopPIController() :
-TrackingController()
+Controller()
 {
     setNull();
 }
 
 OpenSim::DoubleLoopPIController::DoubleLoopPIController(const std::string &coordinateName, const std::string &actuatorName) :
-TrackingController()
+Controller()
 {
     set_coordinate_name(coordinateName);
     set_actuator_name(actuatorName);
 }
 
 OpenSim::DoubleLoopPIController::DoubleLoopPIController(const std::string &aFileName, bool aUpdateFromXMLNode) :
-TrackingController()
+Controller()
 {
     setNull();
     if (aUpdateFromXMLNode) updateFromXMLDocument();
 }
 
 OpenSim::DoubleLoopPIController::DoubleLoopPIController(const DoubleLoopPIController &aController) :
-TrackingController()
+Controller()
 {
     setNull();
     copyData(aController);
@@ -57,8 +57,6 @@ void OpenSim::DoubleLoopPIController::copyData(const DoubleLoopPIController &aCo
     refSplinePosition_ = aController.refSplinePosition_;
     refSplineVelocity_ = aController.refSplineVelocity_;
 
-    _desiredStatesStorage = aController._desiredStatesStorage;
-
 }
 
 void OpenSim::DoubleLoopPIController::initStateFromProperties(SimTK::State& s) const
@@ -69,7 +67,6 @@ void OpenSim::DoubleLoopPIController::initStateFromProperties(SimTK::State& s) c
 void OpenSim::DoubleLoopPIController::setNull()
 {
     constructProperties();
-    _desiredStatesStorage = NULL;
 }
 
 void OpenSim::DoubleLoopPIController::constructProperties()
@@ -113,7 +110,7 @@ void OpenSim::DoubleLoopPIController::computeControls(const SimTK::State& s, Sim
 
 OpenSim::DoubleLoopPIController& OpenSim::DoubleLoopPIController::operator=(const OpenSim::DoubleLoopPIController& aController)
 {
-    TrackingController::operator=(aController);
+    Controller::operator=(aController);
     copyData(aController);
     return(*this);
 }
@@ -184,26 +181,22 @@ SimTK::Vector OpenSim::DoubleLoopPIController::computeStateVariableDerivatives(c
 
 void OpenSim::DoubleLoopPIController::setDesiredStatesStorage(const OpenSim::Storage* aYDesStore)
 {
-    _desiredStatesStorage = aYDesStore;
     OpenSim::Array<double> expPos, expVel;
     const string expPosLabel(get_coordinate_name());
     const string expVelLabel(get_coordinate_name()+ "_u");
     OpenSim::Array<double> expTime;
-    _desiredStatesStorage->getTimeColumn(expTime);
+    aYDesStore->getTimeColumn(expTime);
     // cannot use getDataColumn(string, Array) overload as it is not const :(
     //TODO : throw exception if columns are not found!
-    _desiredStatesStorage->getDataColumn(_desiredStatesStorage->getStateIndex(expPosLabel), expPos);
-    _desiredStatesStorage->getDataColumn(_desiredStatesStorage->getStateIndex(expVelLabel), expVel);
+    aYDesStore->getDataColumn(aYDesStore->getStateIndex(expPosLabel), expPos);
+    aYDesStore->getDataColumn(aYDesStore->getStateIndex(expVelLabel), expVel);
 
-    //TODO: check that splines are empty??
+    //Super ugly hack to reset the spline values, since I don't see any "clear" method
+    refSplinePosition_ = OpenSim::SimmSpline();
+    refSplineVelocity_ = OpenSim::SimmSpline();
     for (int i = 0; i < expTime.getSize(); i++) {
         refSplinePosition_.addPoint(expTime[i], SimTK::convertDegreesToRadians(expPos[i]));
         refSplineVelocity_.addPoint(expTime[i], SimTK::convertDegreesToRadians(expVel[i]));
     }
-}
-
-const OpenSim::Storage& OpenSim::DoubleLoopPIController::getDesiredStatesStorage() const
-{
-    return *_desiredStatesStorage;
 }
 

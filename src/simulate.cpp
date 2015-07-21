@@ -17,7 +17,6 @@ using std::string;
 
 #include "ConfigurationInterpreter.h"
 #include "SimulationManager.h"
-#include "DoubleLoopPIController.h"
 
 int main(int argc, char**argv) {
     cout << "---------------------------------------------------------\n";
