@@ -13,7 +13,7 @@ source_group("Sources" FILES ${DOUBLE_LOOP_SOURCE_FILES})
 
 add_library(SimulationManager STATIC ${SIMULATION_MANAGER_SOURCE_FILES} ${SIMULATION_MANAGER_HEADER_FILES})
 add_library(DoubleLoopController SHARED ${DOUBLE_LOOP_SOURCE_FILES} ${DOUBLE_LOOP_HEADER_FILES})
-target_link_libraries(SimulationManager ${OPENSIM_LIBRARIES})
+target_link_libraries(SimulationManager ${OPENSIM_LIBRARIES} DoubleLoopController)
 target_link_libraries(DoubleLoopController ${OPENSIM_LIBRARIES})
 
 set_target_properties(DoubleLoopController PROPERTIES
