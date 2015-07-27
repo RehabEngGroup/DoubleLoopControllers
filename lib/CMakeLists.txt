@@ -1,6 +1,7 @@
+# Authors: Elena Ceseracciu, Luca Tagliapietra, Monica Reggiani
+
 include_directories(${OPENSIM_INCLUDE_DIRS} ${SIMTK_INCLUDE_DIRS})
 
-# Identify the cpp file(s) that were to be built
 set(SIMULATION_MANAGER_SOURCE_FILES SimulationManager.cpp ConfigurationInterpreter.cpp)
 set(SIMULATION_MANAGER_HEADER_FILES SimulationManager.h ConfigurationInterpreter.h)
 source_group("Headers" FILES ${SIMULATION_MANAGER_HEADER_FILES})

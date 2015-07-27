@@ -1,4 +1,5 @@
-# Define project
+# Authors: Elena Ceseracciu, Luca Tagliapietra, Monica Reggiani
+
 project (DLcontrollerSim)
 
 include_directories(${OPENSIM_INCLUDE_DIRS} ${SIMTK_INCLUDE_DIRS})

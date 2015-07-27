@@ -1,8 +1,6 @@
-###########################################
-## For building with the rest of OpenSim ##
-###########################################
+# Authors: Elena Ceseracciu, Luca Tagliapietra, Monica Reggiani
 
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.8) # TODO: check if higher is needed
 
 # Define project
 project (DoubleLoopControllers)
