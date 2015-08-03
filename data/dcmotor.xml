@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OpenSimDocument Version="30000">
+    <ForceSet name="PendulumActuator">
+        <objects>
+            <TorqueActuator name="DCmotor">
+                <!--Name of Body to which the torque actuator is applied.-->
+                <bodyA>Point</bodyA>
+                <!--Name of Body to which the equal and opposite torque is applied.-->
+                <bodyB>ground</bodyB>
+                <!--Interpret axis in Ground frame if true; otherwise, body A's frame.-->
+                <torque_is_global>true</torque_is_global>
+                <!--Fixed direction about which torque is applied, in Ground or body A frame depending on 'torque_is_global' property.-->
+                <axis>0 0 1</axis>
+                <!--The maximum torque produced by this actuator when fully activated.-->
+                <optimal_force>50</optimal_force>
+            </TorqueActuator>
+        </objects>
+        <groups/>
+    </ForceSet>
+</OpenSimDocument>
+

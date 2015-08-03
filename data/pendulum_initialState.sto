@@ -1,0 +1,8 @@
+Pendulum initial state
+version=1
+nRows=1
+nColumns=3
+inDegrees=no
+endheader
+time    theta    theta_u
+0    0    0
